@@ -1,15 +1,15 @@
 //
-//  CollectionViewCell.swift
+//  InfoCollectionViewCell.swift
 //  task_4
 //
-//  Created by Artem Sulzhenko on 02.01.2023.
+//  Created by Artem Sulzhenko on 11.01.2023.
 //
 
 import UIKit
 
-class CollectionViewCell: UICollectionViewCell {
+class InfoCollectionViewCell: UICollectionViewCell {
 
-    static let identifier = "ATMList"
+    static let identifier = "InfoStandList"
 
     private lazy var installPlaceLabel: UILabel = {
         let label = UILabel()
@@ -26,7 +26,8 @@ class CollectionViewCell: UICollectionViewCell {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.backgroundColor = .black
+
+
         contentView.layer.cornerRadius = 10
 
         contentView.addSubview(installPlaceLabel)
@@ -90,12 +91,6 @@ class CollectionViewCell: UICollectionViewCell {
         installPlaceLabel.text = element.installPlace
         workTimeLabel.text = element.workTime
         currencyLabel.text = element.currency.rawValue
-    }
-
-    func dataBankInCell(element: Bank) {
-        contentView.backgroundColor = .red
-
-        installPlaceLabel.text = element.filialName
     }
 
 }

@@ -1,5 +1,5 @@
 //
-//  DetailsViewControllerViewController.swift
+//  DetailsViewController.swift
 //  task_4
 //
 //  Created by Artem Sulzhenko on 06.01.2023.
@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import MapKit
 
-class DetailsViewControllerViewController: UIViewController {
+class DetailsViewController: UIViewController {
 
     private lazy var mainStackView: UIStackView = {
         let stackView = UIStackView()
@@ -173,7 +173,7 @@ class DetailsViewControllerViewController: UIViewController {
 
     }
 
-    func dataInDetails(element: WelcomeElement, coord: (x: Double, y: Double)) {
+    func dataInDetails(element: ATM, coord: (x: Double, y: Double)) {
         idLabel.text = element.id
         areaLabel.text = element.area.rawValue
         cityLabel.text = "\(element.cityType.rawValue) \(element.city)"

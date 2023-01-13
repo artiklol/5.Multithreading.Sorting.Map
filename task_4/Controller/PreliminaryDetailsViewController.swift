@@ -47,7 +47,7 @@ class PreliminaryDetailsViewController: UIViewController {
         button.addTarget(self, action: #selector(detailButtonTap), for: .touchUpInside)
         return button
     }()
-    private var element: WelcomeElement?
+    private var element: ATM?
     private lazy var coordinateUserLocation: (x: Double, y: Double) = (0, 0)
 
     override func viewDidLoad() {
@@ -107,7 +107,7 @@ class PreliminaryDetailsViewController: UIViewController {
         mainStackView.addArrangedSubview(stackView)
     }
 
-    func dataInPreliminaryDetails(element: WelcomeElement, coordinate: (x: Double, y: Double)) {
+    func dataInPreliminaryDetails(element: ATM, coordinate: (x: Double, y: Double)) {
         installPlaceLabel.text = element.installPlace
         workTimeLabel.text = element.workTime
         currencyLabel.text = element.currency.rawValue
@@ -118,7 +118,7 @@ class PreliminaryDetailsViewController: UIViewController {
     }
 
     @objc func detailButtonTap() {
-        let details = DetailsViewControllerViewController()
+        let details = DetailsViewController()
         guard let element = element else { return }
         details.dataInDetails(element: element, coord: coordinateUserLocation)
         let navigationController = UINavigationController(rootViewController: details)

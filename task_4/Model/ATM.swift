@@ -1,18 +1,23 @@
-// This file was generated from JSON Schema using quicktype, do not modify it directly.
-// To parse the JSON, add this file to your project and do:
 //
-//   let welcome = try? newJSONDecoder().decode(Welcome.self, from: jsonData)
+//  ATM.swift
+//  task_4
+//
+//  Created by Artem Sulzhenko on 10.01.2023.
+//
 
 import Foundation
 import MapKit
 
-// MARK: - WelcomeElement
-class WelcomeElement: NSObject, Codable, MKAnnotation {
-    var coordinate: CLLocationCoordinate2D {
+class ATM: BelarusBank, Codable {
+
+    override var coordinate: CLLocationCoordinate2D {
         return CLLocationCoordinate2D(latitude: Double(gpsX) ?? 0,
                                       longitude: Double(gpsY) ?? 0)
     }
-
+    override var cityB: String {
+        return city
+    }
+    
     let id: String
     let area: Area
     let cityType: CityType
@@ -20,9 +25,9 @@ class WelcomeElement: NSObject, Codable, MKAnnotation {
     let addressType: AddressType
     let address, house, installPlace, workTime: String
     let gpsX, gpsY, installPlaceFull, workTimeFull: String
-    let atmType: ATMType
+    let atmType: ATMTypeEnum
     let atmError: ATMError
-    let currency: Currency
+    let currency: ATMCurrency
     let cashIn, atmPrinter: ATMError
 
     enum CodingKeys: String, CodingKey {
@@ -44,7 +49,7 @@ class WelcomeElement: NSObject, Codable, MKAnnotation {
         case atmPrinter = "ATM_printer"
     }
 
-    init(id: String, area: Area, cityType: CityType, city: String, addressType: AddressType, address: String, house: String, installPlace: String, workTime: String, gpsX: String, gpsY: String, installPlaceFull: String, workTimeFull: String, atmType: ATMType, atmError: ATMError, currency: Currency, cashIn: ATMError, atmPrinter: ATMError) {
+    init(id: String, area: Area, cityType: CityType, city: String, addressType: AddressType, address: String, house: String, installPlace: String, workTime: String, gpsX: String, gpsY: String, installPlaceFull: String, workTimeFull: String, atmType: ATMTypeEnum, atmError: ATMError, currency: ATMCurrency, cashIn: ATMError, atmPrinter: ATMError) {
         self.id = id
         self.area = area
         self.cityType = cityType
@@ -67,14 +72,20 @@ class WelcomeElement: NSObject, Codable, MKAnnotation {
 }
 
 enum AddressType: String, Codable {
-    case addressTypeУл = "ул. "
+    case addressType = " "
+    case addressTypeStreet = "ул. "
     case empty = ""
+    case purple = "-"
+    case бР = "б-р"
     case бул = "бул."
+    case др = "др."
     case мкр = "мкр."
     case пер = "пер."
     case пл = "пл."
     case пос = "пос."
     case пр = "пр."
+    case радОбщПользЯ = "РАД общ. польз-я"
+    case ст = "ст."
     case тракт = "тракт"
     case ул = "ул."
     case шоссе = "шоссе"
@@ -95,7 +106,7 @@ enum ATMError: String, Codable {
     case нет = "нет"
 }
 
-enum ATMType: String, Codable {
+enum ATMTypeEnum: String, Codable {
     case внешний = "Внешний"
     case внутренний = "Внутренний"
     case уличный = "Уличный"
@@ -105,17 +116,21 @@ enum CityType: String, Codable {
     case empty = ""
     case аг = "аг."
     case г = "г."
+    case гП = "г.п."
     case гп = "гп"
     case д = "д."
+    case кП = "к.п."
     case кп = "кп"
     case п = "п."
+    case рН = "р-н"
     case рп = "рп"
+    case сС = "с/с"
 }
 
-enum Currency: String, Codable {
+enum ATMCurrency: String, Codable {
     case byn = "BYN   "
     case bynUsd = "BYN   USD   "
     case empty = ""
 }
 
-typealias Welcome = [WelcomeElement]
+typealias ATMList = [ATM]

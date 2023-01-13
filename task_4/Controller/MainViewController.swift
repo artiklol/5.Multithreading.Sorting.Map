@@ -28,11 +28,11 @@ class MainViewController: UIViewController {
         segmentControl.selectedSegmentTintColor = UIColor(named: "Green")
         segmentControl.layer.borderWidth = 0.5
 
-        let titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor(named: "BlackWhite")]
-        segmentControl.setTitleTextAttributes(titleTextAttributes as [NSAttributedString.Key: Any], for: .normal)
+        let textAttributNormal = [NSAttributedString.Key.foregroundColor: UIColor(named: "BlackWhite")]
+        segmentControl.setTitleTextAttributes(textAttributNormal as [NSAttributedString.Key: Any], for: .normal)
 
-        let titleTextAttributes1 = [NSAttributedString.Key.foregroundColor: UIColor.white]
-        segmentControl.setTitleTextAttributes(titleTextAttributes1, for: .selected)
+        let textAttributChange = [NSAttributedString.Key.foregroundColor: UIColor.white]
+        segmentControl.setTitleTextAttributes(textAttributChange, for: .selected)
         segmentControl.addTarget(self, action: #selector(segmentControlValueChanged(_:)), for: .valueChanged)
         return segmentControl
     }()
@@ -48,22 +48,14 @@ class MainViewController: UIViewController {
     private lazy var locationManager = CLLocationManager()
     private lazy var refreshButton = UIBarButtonItem(title: "Обновить", style: .plain, target: self,
                                                      action: #selector(refreshButtonTapped))
+    let overlayActivityView = UIView()
+    let activityIndicatorView = UIActivityIndicatorView()
 
-    private lazy var atmList: [ATM] = []
-    private lazy var atmListGroupedByCity: [String: [ATM]] = [:]
+    var groupd = [String]()
+    var bel = [BelarusBank]()
     private lazy var preliminaryDetails = PreliminaryDetailsViewController()
     private lazy var coordinateUserLocation: (x: Double, y: Double) = (0, 0)
-    var infoStandList: [InformationStand] = []
-    private lazy var infoStandListGroupedByCity: [String: [InformationStand]] = [:]
-    var bank = [Bank]()
-    private lazy var test: [String: [BelarusBank]] = [:]
-    private lazy var test1: [String: [BelarusBank]] = [:]
-    private lazy var test2: [String: [BelarusBank]] = [:]
-    private lazy var allDataBelarusbank: [String: [BelarusBank]] = [:]
-    private lazy var bel = [BelarusBank]()
-    var seq: [String: [BelarusBank]] = [:]
-    var groupd = [String]()
-
+    let defaultLocation = CLLocation(latitude: 54.2083386, longitude: 28.4736882)
 
 
     override func viewDidLoad() {
@@ -75,7 +67,7 @@ class MainViewController: UIViewController {
 
         setSetting()
         setConstraint()
-        checkingNetworkBeforeFetchingData()
+        checkNetworkBeforeFetchingData()
         checkAuthorization()
     }
 
@@ -138,76 +130,79 @@ class MainViewController: UIViewController {
         }
     }
 
-    private func fethData() {
-        let overlayView = UIView()
-        let activityIndicator = UIActivityIndicatorView()
-        overlayView.backgroundColor = .gray.withAlphaComponent(0.7)
-        overlayView.frame = view.frame
-        activityIndicator.style = UIActivityIndicatorView.Style.large
-        activityIndicator.color = .white
-        activityIndicator.center = CGPoint(x: overlayView.bounds.width / 2, y: overlayView.bounds.height / 2)
-        overlayView.addSubview(activityIndicator)
-        view.addSubview(overlayView)
+    private func setupManager() {
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.startUpdatingLocation()
+    }
+
+    private func startActivityView() {
+        overlayActivityView.backgroundColor = .gray.withAlphaComponent(0.7)
+        overlayActivityView.frame = view.frame
+        activityIndicatorView.style = UIActivityIndicatorView.Style.large
+        activityIndicatorView.color = .white
+        activityIndicatorView.center = CGPoint(x: overlayActivityView.bounds.width / 2,
+                                               y: overlayActivityView.bounds.height / 2)
+        overlayActivityView.addSubview(activityIndicatorView)
+        view.addSubview(overlayActivityView)
         refreshButton.isHidden = true
-        activityIndicator.startAnimating()
+        activityIndicatorView.startAnimating()
+    }
+
+    private func stopActivityView() {
+        refreshButton.isHidden = false
+        activityIndicatorView.stopAnimating()
+        overlayActivityView.removeFromSuperview()
+    }
+
+    private func addAndSortData(data: [BelarusBank]) {
+        bel += data.sorted {
+            CLLocation(latitude: $0.coordinate.latitude,
+                       longitude: $0.coordinate.longitude).distance(
+                        from: defaultLocation) < CLLocation(latitude: $1.coordinate.latitude,
+                                                            longitude: $1.coordinate.longitude).distance(
+                                                                from: defaultLocation) }
+    }
+
+    private func addSortedCity() {
+        var citySet = Set<String>()
+        for bes in bel {
+            if !citySet.contains(bes.cityB){
+                groupd.append(bes.cityB)
+            }
+            citySet.insert(bes.cityB)
+        }
+        listCollectionView.reloadData()
+    }
+
+    private func fethData() {
+        startActivityView()
         mapView.removeAnnotations(mapView.annotations)
 
-
-        let defaultLocation = CLLocation(latitude: 54.2083386, longitude: 28.4736882)
-
-//        let defaultLocation = CLLocation(latitude: 52.425163, longitude: 31.015039)
+        //        let defaultLocation = CLLocation(latitude: 52.425163, longitude: 31.015039)
         let group = DispatchGroup()
-
-
         bel = []
-        test = [:]
+        groupd = []
         group.enter()
-        NetworkManager.fetchDataAtm { atm in
+        NetworkManager.fetchDataAtm { atms in
             if NetworkManager.statusCodeAtm >= 200 && NetworkManager.statusCodeAtm < 300 {
-                self.atmList = atm
-                self.refreshButton.isHidden = false
-                activityIndicator.stopAnimating()
-                overlayView.removeFromSuperview()
-                self.addPointsAutomatedTellerMachine()
-                self.test = Dictionary(grouping: self.atmList, by: { $0.city })
-                for item in self.test {
-                    self.test[item.key] = item.value.sorted {
-                        CLLocation(latitude: $0.coordinate.latitude,
-                                   longitude: $0.coordinate.longitude).distance(
-                                    from: defaultLocation) < CLLocation(latitude: $1.coordinate.latitude,
-                                                                        longitude: $1.coordinate.longitude).distance(
-                                                                            from: defaultLocation)
-                    }
-                }
-                self.bel += self.atmList
-                self.bel = self.bel.sorted {
-                    CLLocation(latitude: $0.coordinate.latitude,
-                               longitude: $0.coordinate.longitude).distance(
-                                from: defaultLocation) < CLLocation(latitude: $1.coordinate.latitude,
-                                                                    longitude: $1.coordinate.longitude).distance(
-                                                                              from: defaultLocation)
-                }
-                var citySet = Set<String>()
-                for bes in self.bel {
-                    if !citySet.contains(bes.cityB){
-                        self.groupd.append(bes.cityB)
-                    }
-                    citySet.insert(bes.cityB)
-                }
-                self.listCollectionView.reloadData()
+                self.addPoints(list: atms, title: "Банкомат")
+                self.addAndSortData(data: atms)
+                self.addSortedCity()
+                self.stopActivityView()
                 group.leave()
             } else {
                 let alert = UIAlertController(title: "Код ответа \(NetworkManager.statusCodeAtm)",
                                               message: "Произошла неизвестная сетевая ошибка",
                                               preferredStyle: .alert)
-                self.refreshButton.isHidden = false
-                activityIndicator.stopAnimating()
-                self.navigationItem.rightBarButtonItem = self.refreshButton
+
                 alert.addAction(UIAlertAction(title: "Повторить ещё раз", style: .default) { _ in
                     self.fethData()
                     group.leave()
                 })
                 alert.addAction(UIAlertAction(title: "Закрыть", style: .cancel, handler: nil))
+
+                self.stopActivityView()
                 self.present(alert, animated: true, completion: nil)
                 group.leave()
             }
@@ -217,77 +212,21 @@ class MainViewController: UIViewController {
         group.enter()
         DispatchQueue.global(qos:.background).async {
             NetworkManager.fetchDataInformationStand { infoStands in
-                self.infoStandList = infoStands
-                self.addPointsInformationStand()
-                self.test1 = Dictionary(grouping: self.infoStandList, by: { $0.city })
-                self.test.merge(self.test1, uniquingKeysWith: +)
-                for item in self.test {
-                    self.test[item.key] = item.value.sorted {
-                        CLLocation(latitude: $0.coordinate.latitude,
-                                   longitude: $0.coordinate.longitude).distance(
-                                    from: defaultLocation) < CLLocation(latitude: $1.coordinate.latitude,
-                                                                        longitude: $1.coordinate.longitude).distance(
-                                                                            from: defaultLocation)
-                    }
-                }
-                self.bel += self.infoStandList
-                self.bel = self.bel.sorted {
-                    CLLocation(latitude: $0.coordinate.latitude,
-                               longitude: $0.coordinate.longitude).distance(
-                                from: defaultLocation) < CLLocation(latitude: $1.coordinate.latitude,
-                                                                    longitude: $1.coordinate.longitude).distance(
-                                                                        from: defaultLocation)
-                }
-                var citySet = Set<String>()
-                for bes in self.bel {
-                    if !citySet.contains(bes.cityB){
-                        self.groupd.append(bes.cityB)
-                    }
-                    citySet.insert(bes.cityB)
-                }
-                self.listCollectionView.reloadData()
+                self.addPoints(list: infoStands, title: "Инфокиоск")
+                self.addAndSortData(data: infoStands)
+                self.addSortedCity()
                 group.leave()
             }
         }
 
         group.enter()
         DispatchQueue.global(qos:.background).async {
-            NetworkManager.fetchDataBank { tes in
-                self.bank = tes
-                self.addPointsBank()
-                self.test2 = Dictionary(grouping: self.bank, by: { $0.city })
-                self.test.merge(self.test2, uniquingKeysWith: +)
-                for item in self.test {
-                    self.test[item.key] = item.value.sorted {
-                        CLLocation(latitude: $0.coordinate.latitude,
-                                   longitude: $0.coordinate.longitude).distance(
-                                    from: defaultLocation) < CLLocation(latitude: $1.coordinate.latitude,
-                                                                        longitude: $1.coordinate.longitude).distance(
-                                                                            from: defaultLocation)
-                    }
-                }
-                self.bel += self.bank
-                self.bel = self.bel.sorted {
-                    CLLocation(latitude: $0.coordinate.latitude,
-                               longitude: $0.coordinate.longitude).distance(
-                                from: defaultLocation) < CLLocation(latitude: $1.coordinate.latitude,
-                                                                    longitude: $1.coordinate.longitude).distance(
-                                                                        from: defaultLocation)
-                }
-                var citySet = Set<String>()
-                for bes in self.bel {
-                    if !citySet.contains(bes.cityB){
-                        self.groupd.append(bes.cityB)
-                    }
-                    citySet.insert(bes.cityB)
-                }
-                self.listCollectionView.reloadData()
+            NetworkManager.fetchDataBank { banks in
+                self.addPoints(list: banks, title: "Банк")
+                self.addAndSortData(data: banks)
+                self.addSortedCity()
                 group.leave()
             }
-        }
-
-        group.notify(queue: .main) {
-
         }
     }
 
@@ -309,7 +248,7 @@ class MainViewController: UIViewController {
         return (isReachable && !needsConnection)
     }
 
-    private func checkingNetworkBeforeFetchingData() {
+    private func checkNetworkBeforeFetchingData() {
         if isConnectedToNetwork() {
             fethData()
         } else {
@@ -326,41 +265,21 @@ class MainViewController: UIViewController {
         mapView.setRegion(region, animated: true)
     }
 
-    private func setupManager() {
-        locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.startUpdatingLocation()
-    }
-
-    private func addPointsAutomatedTellerMachine() {
-        for automatedTellerMachine in atmList {
-            let pinLocation = automatedTellerMachine.coordinate
+    private func addPoints(list: [BelarusBank], title: String) {
+        for element in list {
+            let pinLocation = element.coordinate
             let objectAnnotation = MKPointAnnotation()
             objectAnnotation.coordinate = pinLocation
-            objectAnnotation.title = "Банкомат"
-            objectAnnotation.subtitle = automatedTellerMachine.id
-            mapView.addAnnotation(objectAnnotation)
-        }
-    }
+            objectAnnotation.title = title
 
-    private func addPointsInformationStand() {
-        for informationStand in infoStandList {
-            let pinLocation = informationStand.coordinate
-            let objectAnnotation = MKPointAnnotation()
-            objectAnnotation.coordinate = pinLocation
-            objectAnnotation.title = "Банк"
-            objectAnnotation.subtitle = "\(informationStand.infoId)"
-            mapView.addAnnotation(objectAnnotation)
-        }
-    }
+            if let atm = element as? ATM {
+                objectAnnotation.subtitle = atm.id
+            } else if let infoStand = element as? InformationStand {
+                objectAnnotation.subtitle = "\(infoStand.infoId)"
+            } else if let bank = element as? Bank {
+                objectAnnotation.subtitle = bank.filialId
+            }
 
-    private func addPointsBank() {
-        for ban in bank {
-            let pinLocation = ban.coordinate
-            let objectAnnotation = MKPointAnnotation()
-            objectAnnotation.coordinate = pinLocation
-            objectAnnotation.title = "Инфокиоск"
-            objectAnnotation.subtitle = "\(ban.filialId)"
             mapView.addAnnotation(objectAnnotation)
         }
     }
@@ -438,9 +357,7 @@ class MainViewController: UIViewController {
     }
 
     @objc func refreshButtonTapped() {
-        print(test.count)
-
-        checkingNetworkBeforeFetchingData()
+        checkNetworkBeforeFetchingData()
     }
 }
 
@@ -459,18 +376,16 @@ extension MainViewController: CLLocationManagerDelegate {
 
 extension MainViewController: MKMapViewDelegate {
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-        guard let title = view.annotation?.title, let titleValue = title else { return }
         guard let subtitle = view.annotation?.subtitle, let subtitleValue = subtitle else { return }
-        let titleAtm = "Банкомат"
 
-        if titleValue == titleAtm {
-            var indexResult = 0
-            for index in 0..<atmList.count where atmList[index].id == subtitleValue {
-                indexResult = index
+        for element in bel{
+            if let atm = element as? ATM {
+                if atm.id == subtitleValue {
+                    setRegion(coordinate: atm.coordinate)
+                    showPreliminaryDetails(element: atm)
+                    mapView.deselectAnnotation(view.annotation, animated: false)
+                }
             }
-            setRegion(coordinate: atmList[indexResult].coordinate)
-            showPreliminaryDetails(element: atmList[indexResult])
-            mapView.deselectAnnotation(view.annotation, animated: false)
         }
     }
 
@@ -493,23 +408,27 @@ extension MainViewController: MKMapViewDelegate {
 
 extension MainViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return test.keys.count
+        return groupd.count
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return test[groupd[section]]?.count ?? 0
+        return bel.filter{ $0.cityB == groupd[section] }.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
 
-        let cellTest = test[groupd[indexPath.section]]
+        let cellTest = bel.filter{ $0.cityB == groupd[indexPath.section] }.sorted {
+            CLLocation(latitude: $0.coordinate.latitude,
+                       longitude: $0.coordinate.longitude).distance(
+                        from: self.defaultLocation) < CLLocation(latitude: $1.coordinate.latitude,
+                                                                 longitude: $1.coordinate.longitude).distance(
+                                                                    from: self.defaultLocation) }
+
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionViewCell.identifier,
                                                             for: indexPath) as? CollectionViewCell else {
             return CollectionViewCell()
         }
-
-        guard let cellTest = cellTest else { return cell }
 
         if let atm = cellTest[indexPath.row] as? ATM {
             cell.dataAtmInCell(element: atm)
@@ -541,8 +460,12 @@ extension MainViewController: UICollectionViewDataSource {
 
 extension MainViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedItem = test[groupd[indexPath.section]]
-        guard let selectedItem = selectedItem else { return }
+        let selectedItem = bel.filter{ $0.cityB == groupd[indexPath.section] }.sorted {
+            CLLocation(latitude: $0.coordinate.latitude,
+                       longitude: $0.coordinate.longitude).distance(
+                        from: self.defaultLocation) < CLLocation(latitude: $1.coordinate.latitude,
+                                                                 longitude: $1.coordinate.longitude).distance(
+                                                                    from: self.defaultLocation) }
         if let atm = selectedItem[indexPath.row] as? ATM {
             showPreliminaryDetails(element: atm)
             segmentControl.selectedSegmentIndex = 0

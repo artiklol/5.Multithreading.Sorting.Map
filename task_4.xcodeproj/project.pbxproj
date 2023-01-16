@@ -19,7 +19,6 @@
 		0653EFA52963B0B300BE5D2F /* HeaderCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0653EFA42963B0B300BE5D2F /* HeaderCollectionReusableView.swift */; };
 		065FF40A296CBE6C0015831E /* InformationStand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 065FF409296CBE6C0015831E /* InformationStand.swift */; };
 		067965D3296DC0F3004DBF02 /* Bank.swift in Sources */ = {isa = PBXBuildFile; fileRef = 067965D2296DC0F3004DBF02 /* Bank.swift */; };
-		067965D5296EF73A004DBF02 /* InfoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 067965D4296EF73A004DBF02 /* InfoCollectionViewCell.swift */; };
 		067965D7296F63F6004DBF02 /* BelarusBank.swift in Sources */ = {isa = PBXBuildFile; fileRef = 067965D6296F63F6004DBF02 /* BelarusBank.swift */; };
 		06AEB41429685B32000319E9 /* DetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06AEB41329685B32000319E9 /* DetailsViewController.swift */; };
 		D5EF0D8A20AA6FFAB6A58D19 /* Pods_task_4.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A813A882C4F3290DB6A68843 /* Pods_task_4.framework */; };
@@ -40,7 +39,6 @@
 		0653EFA42963B0B300BE5D2F /* HeaderCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderCollectionReusableView.swift; sourceTree = "<group>"; };
 		065FF409296CBE6C0015831E /* InformationStand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InformationStand.swift; sourceTree = "<group>"; };
 		067965D2296DC0F3004DBF02 /* Bank.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bank.swift; sourceTree = "<group>"; };
-		067965D4296EF73A004DBF02 /* InfoCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoCollectionViewCell.swift; sourceTree = "<group>"; };
 		067965D6296F63F6004DBF02 /* BelarusBank.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BelarusBank.swift; sourceTree = "<group>"; };
 		06AEB41329685B32000319E9 /* DetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsViewController.swift; sourceTree = "<group>"; };
 		259666A16E86A1A67A108EFB /* Pods-task_4.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-task_4.debug.xcconfig"; path = "Target Support Files/Pods-task_4/Pods-task_4.debug.xcconfig"; sourceTree = "<group>"; };
@@ -113,10 +111,10 @@
 		06AC7212296B065700B55749 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				067965D6296F63F6004DBF02 /* BelarusBank.swift */,
 				0653EF9A295F259B00BE5D2F /* ATM.swift */,
 				065FF409296CBE6C0015831E /* InformationStand.swift */,
 				067965D2296DC0F3004DBF02 /* Bank.swift */,
-				067965D6296F63F6004DBF02 /* BelarusBank.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -125,7 +123,6 @@
 			isa = PBXGroup;
 			children = (
 				0653EFA22963418800BE5D2F /* CollectionViewCell.swift */,
-				067965D4296EF73A004DBF02 /* InfoCollectionViewCell.swift */,
 				0653EFA42963B0B300BE5D2F /* HeaderCollectionReusableView.swift */,
 			);
 			path = View;
@@ -299,7 +296,6 @@
 				0653EF86295DCC5E00BE5D2F /* AppDelegate.swift in Sources */,
 				0653EFA32963418800BE5D2F /* CollectionViewCell.swift in Sources */,
 				0653EF9D295F25B300BE5D2F /* NetworkManager.swift in Sources */,
-				067965D5296EF73A004DBF02 /* InfoCollectionViewCell.swift in Sources */,
 				06AEB41429685B32000319E9 /* DetailsViewController.swift in Sources */,
 				067965D3296DC0F3004DBF02 /* Bank.swift in Sources */,
 				065FF40A296CBE6C0015831E /* InformationStand.swift in Sources */,

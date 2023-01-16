@@ -6,19 +6,20 @@
 //
 
 import Foundation
+import UIKit
 
 class NetworkManager {
 
-    static private let jsonUrlAtm = "https://belarusbank.by/api/atm"
-    static private let jsonUrlInformationStands = "https://belarusbank.by/api/infobox"
-    static private var jsonUrlBank = "https://belarusbank.by/api/filials_info"
+    static private let atmsUrl = "https://belarusbank.by/api/atm"
+    static private let informationStandsUrl = "https://belarusbank.by/api/infobox"
+    static private var banksUrl = "https://belarusbank.by/api/filials_info"
 
-    static var statusCodeAtm = 0
-    static var statusCodeInformationStands = 0
-    static var statusCodBank = 0
+    static private var statusCodeAtm = 0
+    static private var statusCodeInformationStands = 0
+    static private var statusCodBank = 0
 
-    static func fetchDataAtm(completion: @escaping ([ATM]) -> Void) {
-        guard let url = URL(string: jsonUrlAtm) else { return }
+    static func fetchDataAtm(completion: @escaping ([ATM], Int) -> Void) {
+        guard let url = URL(string: atmsUrl) else { return }
 
         URLSession.shared.dataTask(with: url) { (data, response, error) in
             if let error = error {
@@ -35,13 +36,13 @@ class NetworkManager {
             let ATMs = result
 
             DispatchQueue.main.async {
-                completion(ATMs)
+                completion(ATMs, statusCodeAtm)
             }
         }.resume()
     }
 
-    static func fetchDataInformationStand(completion: @escaping ([InformationStand]) -> Void) {
-        guard let url = URL(string: jsonUrlInformationStands) else { return }
+    static func fetchDataInformationStand(completion: @escaping ([InformationStand], Int) -> Void) {
+        guard let url = URL(string: informationStandsUrl) else { return }
 
         URLSession.shared.dataTask(with: url) { (data, response, error) in
             if let error = error {
@@ -58,13 +59,13 @@ class NetworkManager {
             let informationStands = result
 
             DispatchQueue.main.async {
-                completion(informationStands)
+                completion(informationStands, statusCodeInformationStands)
             }
         }.resume()
     }
 
-    static func fetchDataBank(completion: @escaping ([Bank]) -> Void) {
-        guard let url = URL(string: jsonUrlBank) else { return }
+    static func fetchDataBank(completion: @escaping ([Bank], Int) -> Void) {
+        guard let url = URL(string: banksUrl) else { return }
 
         URLSession.shared.dataTask(with: url) { (data, response, error) in
             if let error = error {
@@ -81,8 +82,9 @@ class NetworkManager {
             let banks = result
 
             DispatchQueue.main.async {
-                completion(banks)
+                completion(banks, statusCodBank)
             }
+
         }.resume()
     }
 }

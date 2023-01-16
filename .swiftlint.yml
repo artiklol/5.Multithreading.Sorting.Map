@@ -3,3 +3,4 @@ excluded:
   - task_4/Model/ATM.swift
   - task_4/Model/Bank.swift
   - task_4/Controller/MainViewController.swift
+  - task_4/Controller/DetailsViewController.swift

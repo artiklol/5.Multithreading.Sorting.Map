@@ -10,14 +10,21 @@ import MapKit
 
 class InformationStand: BelarusBank, Codable {
 
+    override var mainId: String {
+        return String(infoId)
+    }
+    override var typeName: String {
+        return typeNameInfoStand
+    }
+    override var cityBelarusbank: String {
+        return city
+    }
     override var coordinate: CLLocationCoordinate2D {
         return CLLocationCoordinate2D(latitude: Double(gpsX) ?? 0,
                                       longitude: Double(gpsY) ?? 0)
     }
-    override var cityB: String {
-        return city
-    }
 
+    let typeNameInfoStand = "Инфокиоск"
     let infoId: Int
     let area: Area
     let cityType: CityType
@@ -29,6 +36,59 @@ class InformationStand: BelarusBank, Codable {
     let infType: ATMTypeEnum
     let cashInExist, cashIn, typeCashIn, infPrinter: ATMError
     let regionPlatej, popolneniePlatej, infStatus: ATMError
+    var fixCurrency: FixCurrency {
+        switch currency {
+        case .byn:
+            let fixCurrency = FixCurrency.byn
+            return fixCurrency
+        case .bynRub:
+            let fixCurrency = FixCurrency.bynRub
+            return fixCurrency
+        case .empty:
+            let fixCurrency = FixCurrency.empty
+            return fixCurrency
+        }
+    }
+    var fixCityType: FixCityType {
+        switch cityType {
+        case .empty:
+            let fixCity = FixCityType.empty
+            return fixCity
+        case .agroTown:
+            let fixCity = FixCityType.agroTown
+            return fixCity
+        case .city:
+            let fixCity = FixCityType.city
+            return fixCity
+        case .urbanSettlement:
+            let fixCity = FixCityType.urbanSettlement
+            return fixCity
+        case .urbanSettlementDuplicat:
+            let fixCity = FixCityType.urbanSettlement
+            return fixCity
+        case .village:
+            let fixCity = FixCityType.village
+            return fixCity
+        case .resortVillage:
+            let fixCity = FixCityType.resortVillage
+            return fixCity
+        case .resortVillageDuplicate:
+            let fixCity = FixCityType.resortVillage
+            return fixCity
+        case .settlement:
+            let fixCity = FixCityType.settlement
+            return fixCity
+        case .district:
+            let fixCity = FixCityType.district
+            return fixCity
+        case .workSettlement:
+            let fixCity = FixCityType.workSettlement
+            return fixCity
+        case .villageCouncil:
+            let fixCity = FixCityType.villageCouncil
+            return fixCity
+        }
+    }
 
     enum CodingKeys: String, CodingKey {
         case infoId = "info_id"
@@ -82,6 +142,7 @@ class InformationStand: BelarusBank, Codable {
         self.popolneniePlatej = popolneniePlatej
         self.infStatus = infStatus
     }
+
 }
 
 enum InformationStandCurrency: String, Codable {

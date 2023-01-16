@@ -9,9 +9,9 @@ import UIKit
 
 class CollectionViewCell: UICollectionViewCell {
 
-    static let identifier = "ATMList"
+    static let identifier = "BelarusbankList"
 
-    private lazy var installPlaceLabel: UILabel = {
+    private lazy var nameObjectLabel: UILabel = {
         let label = UILabel()
         label.font = label.font.withSize(10)
         label.textAlignment = .center
@@ -21,18 +21,17 @@ class CollectionViewCell: UICollectionViewCell {
     }()
     private lazy var workTimeTitleLabel = UILabel()
     private lazy var workTimeLabel = UILabel()
-    private lazy var currencyTitleLabel = UILabel()
-    private lazy var currencyLabel = UILabel()
+    private lazy var otherTitleLabel = UILabel()
+    private lazy var otherLabel = UILabel()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-
-        contentView.backgroundColor = UIColor(named: "Green")
+        contentView.backgroundColor = .black
         contentView.layer.cornerRadius = 10
 
-        contentView.addSubview(installPlaceLabel)
+        contentView.addSubview(nameObjectLabel)
         setTitleAndInfo(titleLabel: workTimeTitleLabel, titleText: "Режим работы", infoLabel: workTimeLabel)
-        setTitleAndInfo(titleLabel: currencyTitleLabel, titleText: "Валюта", infoLabel: currencyLabel)
+        setTitleAndInfo(titleLabel: otherTitleLabel, titleText: "Валюта", infoLabel: otherLabel)
 
         setConstraint()
     }
@@ -42,7 +41,7 @@ class CollectionViewCell: UICollectionViewCell {
     }
 
     private func setConstraint() {
-        installPlaceLabel.snp.makeConstraints { maker in
+        nameObjectLabel.snp.makeConstraints { maker in
             maker.top.left.right.equalTo(contentView).inset(5)
         }
         workTimeTitleLabel.snp.makeConstraints { maker in
@@ -53,11 +52,11 @@ class CollectionViewCell: UICollectionViewCell {
             maker.left.right.bottom.equalTo(contentView).inset(5)
             maker.bottom.equalTo(contentView).inset(25)
         }
-        currencyTitleLabel.snp.makeConstraints { maker in
+        otherTitleLabel.snp.makeConstraints { maker in
             maker.left.right.equalTo(contentView).inset(5)
             maker.bottom.equalTo(contentView).inset(15)
         }
-        currencyLabel.snp.makeConstraints { maker in
+        otherLabel.snp.makeConstraints { maker in
             maker.left.right.bottom.equalTo(contentView).inset(5)
         }
     }
@@ -70,16 +69,38 @@ class CollectionViewCell: UICollectionViewCell {
 
         infoLabel.font = infoLabel.font.withSize(10)
         infoLabel.textColor = .white
-        infoLabel.numberOfLines = 0
+        infoLabel.numberOfLines = 5
         infoLabel.textAlignment = .center
 
         contentView.addSubview(titleLabel)
         contentView.addSubview(infoLabel)
     }
 
-    func dataInCell(element: WelcomeElement) {
-        installPlaceLabel.text = element.installPlace
+    func dataAtmInCell(element: ATM) {
+        contentView.backgroundColor = UIColor(named: "Green")
+
+        nameObjectLabel.text = element.installPlace
         workTimeLabel.text = element.workTime
-        currencyLabel.text = element.currency.rawValue
+        otherTitleLabel.text = "Валюта"
+        otherLabel.text = element.fixCurrency.rawValue
     }
+
+    func dataInfoStandInCell(element: InformationStand) {
+        contentView.backgroundColor = UIColor(named: "GreenTwo")
+
+        nameObjectLabel.text = element.installPlace
+        workTimeLabel.text = element.workTime
+        otherTitleLabel.text = "Валюта"
+        otherLabel.text = element.fixCurrency.rawValue
+    }
+
+    func dataBankInCell(element: Bank) {
+        contentView.backgroundColor = UIColor(named: "GreenThree")
+
+        nameObjectLabel.text = element.filialName
+        workTimeLabel.text = element.infoWorktime
+        otherTitleLabel.text = "Телефон"
+        otherLabel.text = element.phoneInfo
+    }
+
 }
